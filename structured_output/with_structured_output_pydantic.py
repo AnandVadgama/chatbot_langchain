@@ -1,7 +1,8 @@
-# only for type hinting and basic structure 
+# only for python universe and basic structure, type enforcement, data validation, default values, automatic converson
 
 from langchain_huggingface import ChatHuggingFace, HuggingFaceEndpoint
 from typing import TypedDict, Annotated, Optional, Literal
+from pydantic import BaseModel, Field
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -13,7 +14,7 @@ llm = HuggingFaceEndpoint(
 
 model = ChatHuggingFace(llm=llm)
 
-class Review(TypedDict):
+class Review(BaseModel):
     """
     key ropics disccussed in the review
     summary of the review
@@ -21,12 +22,12 @@ class Review(TypedDict):
     pros and cons of the review
     name of the reviewer
     """
-    key_themes: Annotated[list[str], "key topics discussed in the review"]
-    summary: Annotated[str, "summary of the review"]
-    sentiment: Annotated[Literal["positive", "negative", "neutral"], "sentiment of the review"]
-    pros: Annotated[Optional[list[str]], "pros of the review"]
-    cons: Annotated[Optional[list[str]], "cons of the review"]
-    name: Annotated[Optional[str], "reviewed by name"]
+    key_themes: list[str] = Field(description= "key topics discussed in the review")
+    summary: str= Field(description= "summary of the review")
+    sentiment: Literal["positive", "negative", "neutral"]= Field("sentiment of the review")
+    pros: Optional[list[str]] = Field(default=None, description="pros of the review")
+    cons: Optional[list[str]] = Field(default=None, description="cons of the review")
+    name: Optional[str] = Field(default=None, description="reviewed by name")
 
 structured_model = model.with_structured_output(Review)
 
@@ -46,4 +47,4 @@ S-Pen support is unique and useful
 reviever name: Anand Vadgama
 """)
 
-print(result['name'])
+print(result)
